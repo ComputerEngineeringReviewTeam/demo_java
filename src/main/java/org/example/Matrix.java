@@ -41,7 +41,9 @@ public class Matrix {
         final int newCols = right.cols;
         final int intermediateVectorNumber = cols;
         final double [] multipliedVectors = new double [newRows*intermediateVectorNumber*newCols];
+
         ExecutorService mapOne = Executors.newFixedThreadPool(threadLimit);
+
         int offset=0;
         for(int i=0;i<newCols;i++){
             for(int j=0;j<intermediateVectorNumber;j++){
@@ -49,11 +51,9 @@ public class Matrix {
                 final int currentJ = j;
                 final double scalar = right.getElement(j, i);
                 mapOne.execute(()->{
-                    System.out.println("starting " + scalar);
                     for(int k=0;k<newRows;k++){
                         multipliedVectors[currentOffset+k] =  scalar*getElement(k, currentJ);
                     }
-                    System.out.println("finishing " + scalar);
                 });
                 offset+=newRows;
             }
