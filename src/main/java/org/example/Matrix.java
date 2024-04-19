@@ -41,7 +41,7 @@ public class Matrix {
         final int newCols = right.cols;
         final int intermediateVectorNumber = cols;
         final double [] multipliedVectors = new double [newRows*intermediateVectorNumber*newCols];
-
+        
         ExecutorService mapOne = Executors.newFixedThreadPool(threadLimit);
 
         int offset=0;
