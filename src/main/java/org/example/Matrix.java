@@ -42,40 +42,52 @@ public class Matrix {
         final int intermediateVectorNumber = cols;
         final double [] multipliedVectors = new double [newRows*intermediateVectorNumber*newCols];
 
-        ExecutorService mapOne = Executors.newFixedThreadPool(threadLimit);
+        //TODO: Utworz i inicjalizuj pierwszego ThreadPoola tutaj. Maksymalna liczba watkow jest w istniejacym polu "threadLimit"
 
+        //MAP 1
         int offset=0;
         for(int i=0;i<newCols;i++){
             for(int j=0;j<intermediateVectorNumber;j++){
-                final int currentOffset = offset;
-                final int currentJ = j;
+
                 final double scalar = right.getElement(j, i);
-                mapOne.execute(()->{
-                    for(int k=0;k<newRows;k++){
-                        multipliedVectors[currentOffset+k] =  scalar*getElement(k, currentJ);
-                    }
-                });
+
+                //TODO: Ponizsza petla mapuje wektor macierzy, na wektor pomnozony przez odpowiedni skalar. Wynik umieszcza w odpowiednim miejscu tablicy.
+                // Umiesc ta petle w funkcji lambda i przekaz do wykonania dla pierwszego Thread Poola.
+                // Zauwaz, iz zmienne "j" i "offset" zmieniaja wartosc w kazdej iteracji petli, nalezy wiec utworzyc kopie tych zmiennych, opatrzone slowem kluczowym ,,final"
+                // i to je wykorzystac w funkcji lambda przekazanej do Thread Poola.
+                for(int k=0;k<newRows;k++){
+                    multipliedVectors[offset+k] =  scalar*getElement(k, j);
+                }
+
                 offset+=newRows;
             }
         }
-        mapOne.shutdown();
-        mapOne.awaitTermination(2, TimeUnit.SECONDS);
-        ExecutorService mapTwo = Executors.newFixedThreadPool(threadLimit);
+
+        //TODO: W tym miejscu zamknij kolejke pierwszego Thread Poola i nakaz mu zakonczenie pracy.
+        //TODO: W tym miejscu poczekaj (maksymalnie przez 3 sekundy), az pierwszy Thread Pool wykona wszystkie zadania.
+
+        //TODO: Utworz i inicjalizuj drugiego ThreadPoola tutaj. Maksymalna liczba watkow jest w istniejacym polu "threadLimit"
+
+        //REDUCE + MAP 2
         Matrix result = new Matrix(newRows, newCols);
         for(int i=0; i<newCols;i++){
-            final int currentI = i;
-            mapTwo.execute(()->{
-                for(int j=0;j<newRows;j++){
-                    double sum = 0;
-                    for(int k=0;k<intermediateVectorNumber;k++){
-                        sum+=multipliedVectors[currentI*(intermediateVectorNumber*newRows)+k*newRows+j];
-                    }
-                    result.setElement(j, currentI, sum);
+
+            //TODO: Ponizsza petla redukuje grupy wektorow do jednego wektora, a nastepnie mapuje wektory do macierzy wynikowej.
+            // Umiesc ta petle w funkcji lambda i przekaz do wykonania dla drugiego Thread Poola.
+            // Zauwaz, iz zmiena "i" zmienia wartosc w kazdej iteracji petli, nalezy wiec utworzyc kopie tej zmiennej, opatrzona slowem kluczowym ,,final"
+            // i to ja wykorzystac w funkcji lambda przekazanej do Thread Poola.
+            for(int j=0;j<newRows;j++){
+                double sum = 0;
+                for(int k=0;k<intermediateVectorNumber;k++){
+                    sum+=multipliedVectors[i*(intermediateVectorNumber*newRows)+k*newRows+j];
                 }
-            });
+                result.setElement(j, i, sum);
+            }
+
         }
-        mapTwo.shutdown();
-        mapTwo.awaitTermination(2, TimeUnit.SECONDS);
+        //TODO: W tym miejscu zamknij kolejke drugiego Thread Poola i nakaz mu zakonczenie pracy.
+        //TODO: W tym miejscu poczekaj (maksymalnie przez 3 sekundy), az drugi Thread Pool wykona wszystkie zadania.
+
         return result;
     }
 
