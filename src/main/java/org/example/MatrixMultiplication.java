@@ -29,7 +29,7 @@ public class MatrixMultiplication {
         }
 
         System.out.println("Macierz m1: "+m1);
-        System.out.println("Macierz m2: "+m1);
+        System.out.println("Macierz m2: "+m2);
 
         Matrix m3 = m1.multiplyBy(m2);
         Matrix m4 = m2.multiplyBy(m1);
